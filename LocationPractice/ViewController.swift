@@ -7,32 +7,28 @@
 //
 
 import UIKit
-import CoreLocation
 import UserNotifications
+import CoreLocation
 
-
-protocol ViewControllerDelegate: class {
-    func setupGeoFence(latitude: Double, longitude: Double, locationName: String)
-}
-
-
-class ViewController: UIViewController {
-
-    weak var delegate: ViewControllerDelegate?
+final class ViewController: UIViewController {
     
-    let locationManager = LocationManager()
+    private let manager = LocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Not sure what to call and how to implement this the right way
+        manager.delegate = self
         
-        //delegate?.setupGeoFence(latitude: <#T##Double#>, longitude: <#T##Double#>, locationName: <#T##String#>)
-        // or
-        
-        locationManager.setupGeoFence(latitude: 55.55555, longitude: 12.34234, locationName: "home")
-        
-        
+        manager.setupGeoFence(latitude: 55.55555, longitude: 12.34234, locationName: "home")
     }
 }
 
+extension ViewController: LocationManagerDelegate {
+    func locationManager(_ locationManager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("Did enter region: \(region)")
+    }
+    
+    func locationManager(_ locationManager: CLLocationManager, didExitRegion region: CLRegion) {
+        print("Did exit region: \(region)")
+    }
+}

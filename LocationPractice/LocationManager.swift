@@ -9,38 +9,36 @@
 import Foundation
 import CoreLocation
 
+protocol LocationManagerDelegate: class {
+    func locationManager(_ locationManager: CLLocationManager, didEnterRegion region: CLRegion)
+    func locationManager(_ locationManager: CLLocationManager, didExitRegion region: CLRegion)
+}
 
-class LocationManager: NSObject, ViewControllerDelegate, CLLocationManagerDelegate {
-    
+final class LocationManager: NSObject {
     private let manager = CLLocationManager()
+    
+    weak var delegate: LocationManagerDelegate?
     
     override init() {
         super.init()
+        
         manager.delegate = self
         manager.requestAlwaysAuthorization()
     }
-    
     
     func setupGeoFence(latitude: Double, longitude: Double, locationName: String) {
         let geoFence: CLCircularRegion = CLCircularRegion(center: CLLocationCoordinate2DMake(latitude, longitude), radius: 50, identifier: locationName)
         manager.startMonitoring(for: geoFence)
         print("Started monitoring geofence")
     }
-    
 }
 
-// Delegate methods
-extension LocationManager {
-    
+extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        print("sending enter notification to user")
+        delegate?.locationManager(manager, didEnterRegion: region)
     }
     
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        print("sending exit notification to user")
+        delegate?.locationManager(manager, didExitRegion: region)
     }
 }
-
-
-
-
